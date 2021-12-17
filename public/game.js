@@ -10,7 +10,7 @@ class Snake {
     this.body = generateBody();
     this.direction = "D"; //0 stands for up
     this.head;
-    this.speed = 300;
+    this.speed = 100;
     this._initial();
   }
 
