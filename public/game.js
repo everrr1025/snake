@@ -9,12 +9,9 @@ class Snake {
     this.alive = true;
     this.body = generateBody();
     this.direction = "D"; //0 stands for up
-    this.head;
+    this.head = { x: null, y: null };
     this.speed = 100;
-    this._initial();
   }
-
-  _initial() {}
 
   updateDirection(dir) {
     this.direction = dir;
@@ -27,38 +24,42 @@ class Snake {
     }
   }
 
-  move(stopGame, food) {
-    let headX = this.body[0][0];
-    let headY = this.body[0][1];
+  die() {
+    this.alive = false;
+  }
+  move(stopGame) {
+    this.head.x = this.body[0][0];
+    this.head.y = this.body[0][1];
     let newHead;
 
     switch (this.direction) {
       case "W":
-        newHead = [headX, --headY];
+        newHead = [this.head.x, --this.head.y];
         break;
       case "A":
-        newHead = [--headX, headY];
+        newHead = [--this.head.x, this.head.y];
         break;
       case "D":
-        newHead = [++headX, headY];
+        newHead = [++this.head.x, this.head.y];
         break;
       case "S":
-        newHead = [headX, ++headY];
+        newHead = [this.head.x, ++this.head.y];
         break;
     }
 
     if (
       newHead[0] < 0 ||
-      newHead[0] > 49 ||
+      newHead[0] > 29 ||
       newHead[1] < 0 ||
-      newHead[1] > 49
+      newHead[1] > 29
     ) {
       this.alive = false;
       stopGame();
       return;
     }
 
-    this.body.forEach(cell => {
+    this.body.forEach((cell) => {
+      //head hits the body
       if (cell[0] === newHead[0] && cell[1] === newHead[1]) {
         this.alive = false;
         stopGame();
@@ -83,9 +84,10 @@ class Snake {
 export default class Game {
   constructor(level) {
     this.level = level;
-
+    this.score = 0;
     this.food = generateFood();
     this.intervalId;
+    this.snake;
     this.grid = new Array(level);
     for (let i = 0; i < level; i++) {
       this.grid[i] = new Array(level);
@@ -93,15 +95,7 @@ export default class Game {
     this._initalSnake();
   }
 
-  _initial() {
-    this._initalSnake();
-  }
-
   _drawGame() {
-    console.log(this.snake.body.length);
-    if (this.snake.speed === 200) {
-      this.launch();
-    }
     const GAME_SCREEN = document.getElementById(`game-screen`);
     GAME_SCREEN.innerHTML = "";
     const CELL_WIDTH = GAME_SCREEN.offsetWidth / this.level + "px";
@@ -117,7 +111,7 @@ export default class Game {
         cell.style.width = CELL_WIDTH;
         cell.style.backgroundColor = "red";
         if (this.food[0] === j && this.food[1] === i) {
-          cell.style.backgroundColor = "white";
+          cell.style.backgroundColor = "bisque";
         }
         line.appendChild(cell);
         this.grid[j][i] = cell;
@@ -132,13 +126,14 @@ export default class Game {
       this.snake.body[0][1] === this.food[1]
     ) {
       this.snake.eat(this.food);
+      this.score++;
       this.food = generateFood();
     }
     this._drawSnake();
+    this._updateScore();
   }
 
   _initalSnake() {
-    debugger;
     this.snake = new Snake();
   }
 
@@ -151,15 +146,30 @@ export default class Game {
     }
   }
 
+  _updateScore() {
+    document.getElementById("score").innerText = this.score;
+  }
+
   handleEvent(key) {
-    if (["A", "S", "W", "D"].includes(key.toUpperCase())) {
-      debugger;
-      this.snake.updateDirection(key.toUpperCase());
+    const direction = key.toUpperCase();
+
+    if (["A", "S", "W", "D"].includes(direction)) {
+      if (direction == "A" && this.snake.direction == "D") {
+        return;
+      }
+      if (direction == "D" && this.snake.direction == "A") {
+        return;
+      }
+      if (direction == "W" && this.snake.direction == "S") {
+        return;
+      }
+      if (direction == "S" && this.snake.direction == "W") {
+        return;
+      }
+      this.snake.updateDirection(direction);
     }
   }
   launch() {
-    // debugger;
-    console.log(`in launcher`);
     if (this.intervalId) {
       this.stop();
     }
@@ -171,7 +181,7 @@ export default class Game {
   stop() {
     clearInterval(this.intervalId);
     setTimeout(() => {
-      // alert(`GAME OVER`);
+      alert(`GAME OVER`);
     });
   }
 }

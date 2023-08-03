@@ -19,19 +19,17 @@ const BODY = [
   [7, 10],
   [6, 10],
   [5, 10],
-  [4, 10]
+  [4, 10],
 ];
 
-export const generateBody = head => {
-  //scope is 0 - 19
-
+export const generateBody = (head) => {
   return BODY;
 };
 
 export const generateFood = () => {
   const foodX = getRandomNumber(0, 19);
   const foodY = getRandomNumber(0, 19);
-  BODY.forEach(cell => {
+  BODY.forEach((cell) => {
     if (cell[0] === foodX && cell[1] === foodY) {
       return generateFood();
     }
