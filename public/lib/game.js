@@ -16,9 +16,10 @@ export default class Game {
   }
 
   _drawGame() {
-    const GAME_SCREEN = document.getElementById(`game-screen`);
+    const GAME_SCREEN = document.getElementById(`map`);
     GAME_SCREEN.innerHTML = "";
     const CELL_WIDTH = GAME_SCREEN.offsetWidth / this.mapSize + "px";
+    //const CELL_WIDTH = '25px';
     for (let i = 0; i < this.mapSize; i++) {
       let line = document.createElement(`div`);
       line.className = "screen-line";
