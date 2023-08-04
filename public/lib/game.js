@@ -1,34 +1,31 @@
 import { getRandomNumber } from "./utils.js";
 import Snake from "./snake.js";
 
-
 export default class Game {
-  constructor(level) {
-    this.level = level;
+  constructor(mapSize) {
+    this.mapSize = mapSize;
+    this.level = 1;
     this.score = 0;
     this.snake = new Snake();
     this.food = this._generateFood();
-    this.intervalId=[];
-    this.grid = new Array(level);
-    for (let i = 0; i < level; i++) {
-      this.grid[i] = new Array(level);
+    this.intervalId = [];
+    this.grid = new Array(mapSize);
+    for (let i = 0; i < mapSize; i++) {
+      this.grid[i] = new Array(mapSize);
     }
-   
-  
   }
 
   _drawGame() {
-
     const GAME_SCREEN = document.getElementById(`game-screen`);
     GAME_SCREEN.innerHTML = "";
-    const CELL_WIDTH = GAME_SCREEN.offsetWidth / this.level + "px";
-    for (let i = 0; i < this.level; i++) {
+    const CELL_WIDTH = GAME_SCREEN.offsetWidth / this.mapSize + "px";
+    for (let i = 0; i < this.mapSize; i++) {
       let line = document.createElement(`div`);
       line.className = "screen-line";
       line.style.height = CELL_WIDTH;
       GAME_SCREEN.appendChild(line);
 
-      for (let j = 0; j < this.level; j++) {
+      for (let j = 0; j < this.mapSize; j++) {
         let cell = document.createElement(`div`);
         cell.className = `screen-cell`;
         cell.style.width = CELL_WIDTH;
@@ -44,6 +41,7 @@ export default class Game {
     this.snake.move(() => {
       this.stop();
     });
+
     if (
       this.snake.body[0][0] === this.food[0] &&
       this.snake.body[0][1] === this.food[1]
@@ -56,8 +54,6 @@ export default class Game {
     this._updateScore();
   }
 
-
-
   _drawSnake() {
     for (let i = 0; i < this.snake.body.length; i++) {
       const cell = this.snake.body[i];
@@ -67,20 +63,22 @@ export default class Game {
     }
   }
 
-  
-_generateFood() {
-  const foodX = getRandomNumber(0, this.level-1);
-  const foodY = getRandomNumber(0, this.level-1);
-  this.snake.body.forEach((cell) => {
-    if (cell[0] === foodX && cell[1] === foodY) {
-      return this._generateFood();
-    }
-  });
+  _generateFood() {
+    const foodX = getRandomNumber(0, this.mapSize - 1);
+    const foodY = getRandomNumber(0, this.mapSize - 1);
+    this.snake.body.forEach((cell) => {
+      if (cell[0] === foodX && cell[1] === foodY) {
+        return this._generateFood();
+      }
+    });
 
-  return [foodX, foodY];
-}
+    return [foodX, foodY];
+  }
   _updateScore() {
-    document.getElementById("score").innerText = this.score;
+    this.level = (200 - this.snake.speed) / 10 + 1;
+    document.getElementById(
+      "score"
+    ).innerText = `Score:${this.score} - Level:${this.level}`;
   }
 
   handleEvent(key) {
@@ -103,33 +101,22 @@ _generateFood() {
     }
   }
 
-  
   launch() {
-
-  if(!this.snake.alive) return;
-   this.intervalId.forEach((id)=>{
-    clearTimeout(id)
-   })
+    if (!this.snake.alive) return;
+    this.intervalId.forEach((id) => {
+      clearTimeout(id);
+    });
     this._drawGame();
-    const id= setTimeout(() => {
-    this.launch()
-   },this.snake.speed)
-   this.intervalId= []
-   this.intervalId.push(id)
-   console.log(this.intervalId)
+    const id = setTimeout(() => {
+      this.launch();
+    }, this.snake.speed);
+    this.intervalId = [];
+    this.intervalId.push(id);
   }
 
-  // launch(){
-  //   this.intervalId = setInterval(()=>{
-  //     this._drawGame();
-  //   },this.snake.speed)
-  // }
-
   stop() {
-    this.intervalId.forEach((id)=>{
-     
-      clearTimeout(id)
-     })
-    
+    this.intervalId.forEach((id) => {
+      clearTimeout(id);
+    });
   }
 }
