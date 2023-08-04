@@ -8,4 +8,4 @@ const initial = (mapSize) => {
   myGame.launch();
 };
 
-initial(30);
+initial(15);

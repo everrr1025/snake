@@ -64,13 +64,18 @@ export default class Game {
   }
 
   _generateFood() {
-    const foodX = getRandomNumber(0, this.mapSize - 1);
-    const foodY = getRandomNumber(0, this.mapSize - 1);
-    this.snake.body.forEach((cell) => {
-      if (cell[0] === foodX && cell[1] === foodY) {
-        return this._generateFood();
-      }
-    });
+    let shouldRedo = true;
+    let foodX, foodY;
+    while (shouldRedo) {
+      foodX = getRandomNumber(0, this.mapSize - 1);
+      foodY = getRandomNumber(0, this.mapSize - 1);
+      shouldRedo = false;
+      this.snake.body.forEach((cell) => {
+        if (cell[0] === foodX && cell[1] === foodY) {
+          shouldRedo = true;
+        }
+      });
+    }
 
     return [foodX, foodY];
   }
